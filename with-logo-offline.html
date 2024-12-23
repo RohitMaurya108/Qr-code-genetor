@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Code with Logo (Offline)</title>
+    <script src="qrcode.min.js"></script>
+    <!-- Replace with the downloaded library -->
+    <style>
+      #qrcode-container {
+        position: relative;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>QR Code Generator with Logo (Offline)</h1>
+    <input type="text" id="text" placeholder="Enter text or URL" />
+    <button onclick="generateQRCode()">Generate QR Code</button>
+    <button id="download-btn" style="display: none">Download QR Code</button>
+    <div id="qrcode-container">
+      <canvas id="qrcode"></canvas>
+    </div>
+
+    <script>
+      function generateQRCode() {
+        const text = document.getElementById("text").value;
+        const qrcodeCanvas = document.getElementById("qrcode");
+
+        // Generate the QR code using qrcode.js
+        const qrCode = new QRCode(document.createElement("div"), {
+          text: text,
+          width: 800,
+          height: 800,
+          margin: 2,
+        });
+
+        const qrCanvas = qrCode._oDrawing._elCanvas; // Access generated QR canvas
+        qrcodeCanvas.width = qrCanvas.width;
+        qrcodeCanvas.height = qrCanvas.height;
+
+        const ctx = qrcodeCanvas.getContext("2d");
+        ctx.drawImage(qrCanvas, 0, 0);
+
+        // Add logo
+        addLogoToQRCode();
+      }
+
+      function addLogoToQRCode() {
+        const qrcodeCanvas = document.getElementById("qrcode");
+        const ctx = qrcodeCanvas.getContext("2d");
+        const logoSize = qrcodeCanvas.width * 0.25; // 20% of QR code size
+        const img = new Image();
+        img.src = "logo.jpg"; // Replace with your logo path
+
+        img.onload = () => {
+          const x = (qrcodeCanvas.width - logoSize) / 2;
+          const y = (qrcodeCanvas.height - logoSize) / 2;
+          ctx.drawImage(img, x, y, logoSize, logoSize);
+
+          // Enable download button
+          const downloadBtn = document.getElementById("download-btn");
+          downloadBtn.style.display = "inline-block";
+          downloadBtn.onclick = () => downloadQRCode(qrcodeCanvas);
+        };
+      }
+
+      function downloadQRCode(canvas) {
+        const link = document.createElement("a");
+        link.download = "qrcode_with_logo.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }
+    </script>
+  </body>
+</html>
